@@ -1,5 +1,7 @@
 export {};
 
+let eventsRegistered = false;
+
 function makePrompt(prompt: string) {
 	const finalPrompt = `Answer the following multiple choice question. Only give me the answer to the question below without any other text. Keep in mind that this may or may not be multiple choice:\n${prompt.replace(
 		/\d+ points/,
@@ -86,46 +88,47 @@ chrome.storage.local.get(['apiKey'], ({ apiKey }) => {
 		}
 	}
 
-	chrome.contextMenus.create({
-		id: 'execute-request',
-		title: 'Execute Request',
-		contexts: ['selection'],
-	});
-
-	chrome.contextMenus.onClicked.addListener((info, tab) => {
-		if (info.menuItemId === 'execute-request') {
-			chrome.scripting.executeScript(
-				{
-					target: { tabId: tab!.id as number },
-					func: () => {
-						return window.getSelection()!.toString();
-					},
-				},
-				(selection) => {
-					const prompt = selection[0].result!.toString();
-					executeRequest(prompt);
-				}
-			);
-		}
-	});
-
-	chrome.commands.onCommand.addListener((command) => {
-		if (command === 'execute-request') {
-			chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+	if (!eventsRegistered) {
+		chrome.contextMenus.create({
+			id: 'execute-request',
+			title: 'Execute Request',
+			contexts: ['selection'],
+		});
+		eventsRegistered = true;
+		chrome.contextMenus.onClicked.addListener((info, tab) => {
+			if (info.menuItemId === 'execute-request') {
 				chrome.scripting.executeScript(
 					{
-						target: { tabId: tabs[0].id as number },
+						target: { tabId: tab!.id as number },
 						func: () => {
-							return window.getSelection()?.toString();
+							return window.getSelection()!.toString();
 						},
 					},
 					(selection) => {
-						const prompt = selection[0].result;
-						if (!prompt) throw new Error('No text selected');
+						const prompt = selection[0].result!.toString();
 						executeRequest(prompt);
 					}
 				);
-			});
-		}
-	});
+			}
+		});
+		chrome.commands.onCommand.addListener((command) => {
+			if (command === 'execute-request') {
+				chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+					chrome.scripting.executeScript(
+						{
+							target: { tabId: tabs[0].id as number },
+							func: () => {
+								return window.getSelection()?.toString();
+							},
+						},
+						(selection) => {
+							const prompt = selection[0].result;
+							if (!prompt) throw new Error('No text selected');
+							executeRequest(prompt);
+						}
+					);
+				});
+			}
+		});
+	}
 });
