@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "forms-gpt",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "storage",
+    "scripting",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "*://docs.google.com/forms*"
+  ],
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "commands": {
+    "execute-request": {
+      "suggested_key": {
+        "default": "Ctrl+K"
+      },
+      "description": "Solve"
+    }
+  }
+}
