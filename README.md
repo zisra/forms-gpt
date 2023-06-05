@@ -2,10 +2,12 @@
 A simple chrome extensions that uses GPT-3.5 to solve google forms questions.
 
 > **Warning**
+>
 > Note you need to have an [paid OpenAI account](https://platform.openai.com/account/billing/overview) to get an [API key](https://platform.openai.com/account/api-keys). 
 
 
 > **Note**
+>
 > forms-gpt is only optimized for multiple-choice questions on [Google Forms](https://docs.google.com/forms/)
 
 ## Installation
